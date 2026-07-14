@@ -58,7 +58,7 @@ app.use(async (_req, _res, next) => {
   next();
 });
 
-if (process.env.NODE_ENV !== "production") {
+if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
   connectDB()
     .then(() => {
       app.listen(port, () => {
