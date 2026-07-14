@@ -13,8 +13,9 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+const clientUrl = process.env.CLIENT_URL || process.env.NEXT_PUBLIC_CLIENT_URL || "http://localhost:3000";
 const allowedOrigins = [
-  process.env.NEXT_PUBLIC_CLIENT_URL || "http://localhost:3000",
+  clientUrl,
   "http://localhost:3000",
   "http://localhost:3001",
 ];
@@ -43,15 +44,31 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 
-connectDB()
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
+let dbConnected = false;
+
+app.use(async (_req, _res, next) => {
+  if (!dbConnected) {
+    try {
+      await connectDB();
+      dbConnected = true;
+    } catch (error) {
+      console.error("Failed to connect to database:", error);
+    }
+  }
+  next();
+});
+
+if (process.env.NODE_ENV !== "production") {
+  connectDB()
+    .then(() => {
+      app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to connect to database:", error);
+      process.exit(1);
     });
-  })
-  .catch((error) => {
-    console.error("Failed to connect to database:", error);
-    process.exit(1);
-  });
+}
 
 export default app;
