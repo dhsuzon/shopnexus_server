@@ -34,6 +34,25 @@ app.use(
 );
 app.use(express.json({ limit: "10mb" }));
 
+let dbConnected = false;
+let dbConnecting = false;
+
+app.use(async (req, res, next) => {
+  if (req.path === "/") return next();
+  if (!dbConnected && !dbConnecting) {
+    dbConnecting = true;
+    try {
+      await connectDB();
+      dbConnected = true;
+    } catch (error) {
+      console.error("Failed to connect to database:", error);
+    } finally {
+      dbConnecting = false;
+    }
+  }
+  next();
+});
+
 app.get("/", (_req, res) => {
   res.send("ShopNexus API is running");
 });
@@ -43,20 +62,6 @@ app.use("/api/products", reviewRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/newsletter", newsletterRoutes);
-
-let dbConnected = false;
-
-app.use(async (_req, _res, next) => {
-  if (!dbConnected) {
-    try {
-      await connectDB();
-      dbConnected = true;
-    } catch (error) {
-      console.error("Failed to connect to database:", error);
-    }
-  }
-  next();
-});
 
 if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
   connectDB()
