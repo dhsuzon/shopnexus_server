@@ -16,7 +16,7 @@
   "dependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.1.1",
+    "@types/node": "^22.20.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -24,7 +24,7 @@
     "mongodb": "^7.5.0",
     "nodemon": "^3.1.14",
     "stripe": "^22.3.1",
-    "typescript": "^7.0.2"
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "tsx": "^4.23.0"
